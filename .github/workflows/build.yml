@@ -14,11 +14,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install raylib (PPA)
+    - name: Build & install raylib from source
       run: |
         sudo apt-get update
-        sudo add-apt-repository -y ppa:lucasw/raylib
-        sudo apt-get install -y libraylib-dev
+        sudo apt-get install -y build-essential cmake git \
+            libgl1-mesa-dev libx11-dev libxi-dev libxcursor-dev \
+            libxrandr-dev libxinerama-dev libxxf86vm-dev
+
+        git clone --depth 1 --branch 5.5.0 https://github.com/raysan5/raylib.git
+        cmake -B raylib/build -S raylib -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF
+        sudo cmake --build raylib/build --target install -j$(nproc)
 
     - name: Build
       run: |
