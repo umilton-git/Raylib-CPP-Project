@@ -1,0 +1,65 @@
+name: Build (raylib C++)
+
+on:
+  push:          { paths: [ 'src/**', '.github/workflows/**' ] }
+  pull_request:  { paths: [ 'src/**' ] }
+
+jobs:
+# ───────────────────────────────────────────────────────────────
+# 1) Ubuntu / GCC / libraylib-dev
+# ───────────────────────────────────────────────────────────────
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install raylib
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libraylib-dev
+
+    - name: Build
+      run: |
+        mkdir -p build
+        g++ -std=c++17 \
+            src/main.cpp src/fella.cpp src/ball.cpp src/ball3d.cpp \
+            -lraylib -lGL -lm -lpthread -ldl -lrt -lX11 \
+            -o build/raylib_demo_linux
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: raylib-demo-linux
+        path: build/raylib_demo_linux
+
+# ───────────────────────────────────────────────────────────────
+# 2) Windows / MSYS2 MinGW / raylib
+# ───────────────────────────────────────────────────────────────
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # MSYS2 action gives us pacman on Windows
+    - name: Set up MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: >
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-raylib
+
+    - name: Build (MinGW-w64)
+      shell: msys2 {0}
+      run: |
+        mkdir -p build
+        g++ -std=c++17 \
+            src/main.cpp src/fella.cpp src/ball.cpp src/ball3d.cpp \
+            -lraylib -lopengl32 -lgdi32 -lwinmm \
+            -o build/raylib_demo_win.exe
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: raylib-demo-win
+        path: build/raylib_demo_win.exe
