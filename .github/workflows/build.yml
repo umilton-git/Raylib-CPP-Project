@@ -21,7 +21,7 @@ jobs:
             libgl1-mesa-dev libx11-dev libxi-dev libxcursor-dev \
             libxrandr-dev libxinerama-dev libxxf86vm-dev
 
-        git clone --depth 1 --branch 5.5.0 https://github.com/raysan5/raylib.git
+        git clone --depth 1 --branch master https://github.com/raysan5/raylib.git
         cmake -B raylib/build -S raylib -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF
         sudo cmake --build raylib/build --target install -j$(nproc)
 
